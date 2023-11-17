@@ -1,4 +1,6 @@
 const express = require("express");
+const db = require("../db/models");
+const bcrypt = require("bcryptjs");
 
 const router = express.Router();
 
@@ -12,8 +14,20 @@ router.get("/add-user", (req,res)=> {
 });
 
 
-router.post("/add-user", (req,res)=> {
-    res.send(req.body)
+router.post("/add-user", async(req,res)=> {
+    var dados = req.body;
+    
+    dados.password = await bcrypt.hash(dados.password, 8);
+
+    await db.users.create(dados).then(()=>{
+        return res.json({
+            message: "Usuário cadastrado com sucesso !!!"
+        });
+    }).catch((err)=> {
+        return res.status(400).json({
+            message:"Erro:: Usuário não foi cadastrado",err
+        });
+    })
 });
 
 module.exports = router;
