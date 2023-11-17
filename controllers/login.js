@@ -20,13 +20,14 @@ router.post("/add-user", async(req,res)=> {
     dados.password = await bcrypt.hash(dados.password, 8);
 
     await db.users.create(dados).then(()=>{
-        return res.json({
-            message: "Usuário cadastrado com sucesso !!!"
-        });
-    }).catch((err)=> {
-        return res.status(400).json({
-            message:"Erro:: Usuário não foi cadastrado",err
-        });
+
+        req.flash("success_msg", "Usuário cadastrado com sucesso");
+        res.redirect("/login")
+
+    }).catch(()=> {
+        
+        req.flash("error_msg", "Erro::Usuário Não foi cadastrado");
+        res.redirect("/login/add-user");
     })
 });
 
